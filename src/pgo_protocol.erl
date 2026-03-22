@@ -21,6 +21,8 @@
          decode_message/4,
          decode_error_response_message/1,
          decode_row/4,
+         build_decoder/2,
+         decode_row_precompiled/2,
          decode_strings/1,
          bind_requires_statement_description/1,
          format_error/1]).
@@ -601,3 +603,38 @@ decode_value(#row_description_field{type_info=TypeInfo,
     pg_types:decode(Value, TypeInfo);
 decode_value(#row_description_field{format = text}, _Value, _OIDMap, _DecodeOptions) ->
     throw(no_text_format_support).
+
+%% Pre-compiled decoder: build once per RowDescription, apply per row.
+%% Captures decode funs in closures to avoid per-row record access and
+%% proplists:get_bool overhead.
+-spec build_decoder([#row_description_field{}], proplists:proplist()) -> term().
+build_decoder(Fields, DecodeOptions) ->
+    AsMap = proplists:get_bool(return_rows_as_maps, DecodeOptions),
+    Decoders = [begin
+        TypeInfo = Field#row_description_field.type_info,
+        Name = Field#row_description_field.name,
+        DecodeFun = fun(Value) -> pg_types:decode(Value, TypeInfo) end,
+        {DecodeFun, Name}
+    end || Field <- Fields],
+    {Decoders, AsMap}.
+
+%% Decode a row using a pre-compiled decoder.
+-spec decode_row_precompiled(term(), [binary()]) -> tuple() | map().
+decode_row_precompiled({Decoders, false}, Values) ->
+    decode_precompiled_tuple(Decoders, Values, []);
+decode_row_precompiled({Decoders, true}, Values) ->
+    decode_precompiled_map(Decoders, Values, #{}).
+
+decode_precompiled_tuple([{_DecodeFun, _Name} | Ds], [null | Vs], Acc) ->
+    decode_precompiled_tuple(Ds, Vs, [null | Acc]);
+decode_precompiled_tuple([{DecodeFun, _Name} | Ds], [Value | Vs], Acc) ->
+    decode_precompiled_tuple(Ds, Vs, [DecodeFun(Value) | Acc]);
+decode_precompiled_tuple([], [], Acc) ->
+    list_to_tuple(lists:reverse(Acc)).
+
+decode_precompiled_map([{_DecodeFun, Name} | Ds], [null | Vs], Acc) ->
+    decode_precompiled_map(Ds, Vs, Acc#{Name => null});
+decode_precompiled_map([{DecodeFun, Name} | Ds], [Value | Vs], Acc) ->
+    decode_precompiled_map(Ds, Vs, Acc#{Name => DecodeFun(Value)});
+decode_precompiled_map([], [], Acc) ->
+    Acc.

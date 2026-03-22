@@ -59,7 +59,7 @@ resolve_password(Options) ->
         % expect row_description or no_data
     |   row_description
         % expect data_row or command_complete
-    |   {rows, [#row_description_field{}]}
+    |   {rows, [#row_description_field{}], term()}
         % expect command_complete
     |   no_data
         % expect ready_for_query
@@ -533,14 +533,14 @@ receive_loop0(#bind_complete{}, bind_complete, DecodeFun, Acc0, DecodeOptions, C
 receive_loop0(#no_data{}, row_description, DecodeFun, Acc0, DecodeOptions, Conn) ->
     receive_loop(no_data, DecodeFun, Acc0, DecodeOptions, Conn);
 receive_loop0(#row_description{fields = Fields}, row_description, DecodeFun, Acc0, DecodeOptions, Conn) ->
-    %% oob_update_oid_map_from_fields_if_required(Conn, Fields, DecodeOptions),
-    receive_loop({rows, Fields}, DecodeFun, Acc0, DecodeOptions, Conn);
-receive_loop0(#data_row{values = Values}, {rows, Fields} = LoopState, undefined=DecodeFun,
-              Acc0, DecodeOptions, Conn=#conn{pool=Pool}) ->
-    DecodedRow = pgo_protocol:decode_row(Fields, Values, Pool, DecodeOptions),
+    Decoder = pgo_protocol:build_decoder(Fields, DecodeOptions),
+    receive_loop({rows, Fields, Decoder}, DecodeFun, Acc0, DecodeOptions, Conn);
+receive_loop0(#data_row{values = Values}, {rows, _Fields, Decoder} = LoopState, undefined=DecodeFun,
+              Acc0, DecodeOptions, Conn) ->
+    DecodedRow = pgo_protocol:decode_row_precompiled(Decoder, Values),
     receive_loop(LoopState, DecodeFun, [DecodedRow | Acc0], DecodeOptions, Conn);
-receive_loop0(#data_row{values = Values}, {rows, Fields} = LoopState, DecodeFun, Acc0, DecodeOptions, Conn=#conn{pool=Pool}) ->
-    DecodedRow = pgo_protocol:decode_row(Fields, Values, Pool, DecodeOptions),
+receive_loop0(#data_row{values = Values}, {rows, Fields, Decoder} = LoopState, DecodeFun, Acc0, DecodeOptions, Conn) ->
+    DecodedRow = pgo_protocol:decode_row_precompiled(Decoder, Values),
     receive_loop(LoopState, DecodeFun, [DecodeFun(DecodedRow, Fields) | Acc0], DecodeOptions, Conn);
 receive_loop0(#command_complete{command_tag = Tag}, _LoopState, DecodeFun, Acc0, DecodeOptions, Conn) ->
     {Command, NumRows} = decode_tag(Tag),
