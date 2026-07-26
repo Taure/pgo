@@ -29,12 +29,16 @@
 
 -export_type([result/0,
               error/0,
+              pool/0,
+              row/0,
+              options/0,
               pool_config/0,
-              decode_fun/0]).
+              decode_fun/0,
+              decode_option/0]).
 
 -type result() :: #{command := atom(),
-                    num_rows := integer() | table,
-                    rows := list()} | {error, error()} | {error, any()}.
+                    num_rows := non_neg_integer() | table,
+                    rows := [row()]} | {error, error()} | {error, any()}.
 
 -type error() :: {pgo_error, #{error_field() => binary()}} | pg_types:encoding_error().
 
@@ -60,7 +64,7 @@
 -type pool_config() :: #{host => string(),
                          port => integer(),
                          user => string(),
-                         password => string(),
+                         password => string() | fun(() -> iodata()),
                          database => string(),
 
                          %% pool specific settings
@@ -101,9 +105,16 @@ query(Query, Params, Options) ->
             Pool = maps:get(pool, Options, default),
             PoolOptions = maps:get(pool_options, Options, []),
             case checkout(Pool, PoolOptions) of
-                {ok, Ref, Conn} ->
+                {ok, Ref={_, _, _, Holder}, Conn} ->
                     try
                         query(Query, Params, Options, Conn)
+                    of
+                        {error, closed} ->
+                            maybe_timeout_error(Holder);
+                        {error, einval} ->
+                            maybe_timeout_error(Holder);
+                        Result ->
+                            Result
                     after
                         checkin(Ref, Conn)
                     end;
@@ -212,16 +223,16 @@ with_conn(Conn, Fun) ->
     end.
 
 %% @doc Returns a connection from the pool.
--spec checkout(atom()) -> {ok, pgo_pool:pool_ref(), pgo_pool:conn()} | {error, any()}.
+-spec checkout(atom()) -> {ok, pgo_pool:ref(), pgo_pool:conn()} | {error, any()}.
 checkout(Pool) ->
     pgo_pool:checkout(Pool, []).
 
--spec checkout(atom(), [pool_option()]) -> {ok, pgo_pool:pool_ref(), pgo_pool:conn()} | {error, any()}.
+-spec checkout(atom(), [pool_option()]) -> {ok, pgo_pool:ref(), pgo_pool:conn()} | {error, any()}.
 checkout(Pool, Options) ->
     pgo_pool:checkout(Pool, Options).
 
 %% @doc Return a checked out connection to its pool
--spec checkin(pgo_pool:pool_ref(), pgo_pool:conn()) -> ok.
+-spec checkin(pgo_pool:ref(), pgo_pool:conn()) -> ok.
 checkin(Ref, Conn) ->
     pgo_pool:checkin(Ref, Conn, []).
 
@@ -229,6 +240,12 @@ checkin(Ref, Conn) ->
 -spec break(pgo_pool:conn()) -> ok.
 break(Conn) ->
     pgo_connection:break(Conn).
+
+maybe_timeout_error(Holder) ->
+    case ets:info(Holder, size) of
+        undefined -> {error, query_timeout};
+        _ -> {error, closed}
+    end.
 
 format_error(Error=#{module := Module}) ->
     Module:format_error(Error);
