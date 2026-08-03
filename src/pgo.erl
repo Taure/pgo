@@ -41,14 +41,14 @@
               decode_option/0]).
 
 -type result() :: #{command := atom(),
-                    num_rows := non_neg_integer() | table,
+                    num_rows := non_neg_integer() | atom(),
                     rows := [row()]} | {error, error()} | {error, any()}.
 
 -type error() :: {pgo_error, #{error_field() => binary()}} | pg_types:encoding_error().
 
 -type pool() :: atom().
 
--type row() :: list() | map().
+-type row() :: tuple() | map().
 -type fields() :: [#row_description_field{}].
 -type decode_fun() :: fun((row(), fields()) -> row()) | undefined.
 
