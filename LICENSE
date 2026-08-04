@@ -176,3 +176,25 @@
 
    END OF TERMS AND CONDITIONS
 
+
+-----------------------------------------------------------------------------
+
+   Copyright (c) 2026 Widgrens IT AB (org.nr 559241-2752),
+   Melongatan 15, 754 49 Uppsala, Sweden.
+
+   This copyright statement is added under the permission granted in clause 4
+   of the licence above, which allows a distributor to add its own copyright
+   statement to its modifications. It covers only those modifications.
+
+   This repository is a derivative work, not an original one. It is a fork of
+   pgo (https://github.com/erleans/pgo) by Tristan Sloughter and the pgo
+   contributors, distributed under the Apache License, Version 2.0 set out
+   above. Copyright in the original work remains with its authors and is
+   neither claimed nor reassigned here.
+
+   Parts of this software are derived from further projects under their own
+   terms, including code under the BSD 2-Clause Licence and code under the
+   Apache License, Version 2.0 held by other authors. The NOTICE file at the
+   root of this repository records each origin and reproduces the notices that
+   must be retained when this software is redistributed. Read it together with
+   this file.

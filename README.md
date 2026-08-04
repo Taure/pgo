@@ -6,6 +6,27 @@
 
 PG...Oh god not nother Postgres client in Erlang...
 
+## Origin
+
+This is a fork of [pgo](https://github.com/erleans/pgo) by Tristan Sloughter
+and the pgo contributors, licensed under the Apache License, Version 2.0. The
+design and nearly all of the code are theirs, and the credit for them is too.
+
+The fork exists to carry a small set of changes that projects here depend on,
+and to release them on a cadence those projects control. Relative to upstream
+it adds:
+
+* prepared statements: `pgo:prepare/2,3` and `pgo:query_prepared/3,4`,
+  including auto-preparation across the connections in a pool
+* a `tcp_closed` message is handled the same way as `ssl_closed` in
+  `pgo_connection`
+* a `COMMIT` that the server downgrades to `ROLLBACK` is surfaced instead of
+  being reported as a successful commit
+
+Everything else is upstream's. Full attribution for this project and for the
+projects it in turn derives from is in [NOTICE](NOTICE); licence terms are in
+[LICENSE](LICENSE).
+
 ## Why
 
 * No message passing. Clients checkout the socket and use it directly.
@@ -192,3 +213,10 @@ $ rebar3 eunit
 Much is owed to https://github.com/semiocast/pgsql (especially for protocol step logic) and https://github.com/epgsql/epgsql/ (especially for some decoding logic).
 
 The pool implementation is owed to James Fish's found in `db_connection` [PR 108](https://github.com/elixir-ecto/db_connection/pull/108). While [db_connection](https://github.com/elixir-ecto/db_connection) and [postgrex](https://github.com/elixir-ecto/postgrex) as a whole were both used as inspiration as well.
+
+## Licence
+
+Apache License, Version 2.0. See [LICENSE](LICENSE) for the terms, and
+[NOTICE](NOTICE) for the origin and licence of the code this project is derived
+from, including code under the BSD 2-Clause Licence. Both files must be kept
+with the source when it is redistributed.
