@@ -2,17 +2,21 @@
 %% db_connectin https://github.com/elixir-ecto/db_connection/pull/108
 -module(pgo_pool).
 
--export([start_link/2,
-         checkout/2,
-         checkin/3,
-         disconnect/4,
-         stop/4,
-         update/4,
-         format_error/1]).
+-export([
+    start_link/2,
+    checkout/2,
+    checkin/3,
+    disconnect/4,
+    stop/4,
+    update/4,
+    format_error/1
+]).
 
--export([init/1,
-         handle_call/3,
-         handle_info/2]).
+-export([
+    init/1,
+    handle_call/3,
+    handle_info/2
+]).
 
 -include("pgo_internal.hrl").
 
@@ -24,14 +28,15 @@
 -define(TIME_UNIT, 1000).
 -define(HOLDER_KEY, '__info__').
 
--export_type([ref/0,
-              conn/0]).
+-export_type([
+    ref/0,
+    conn/0
+]).
 
 -type conn() :: #conn{}.
--type ref() :: {Pool :: pid(),
-                Ref :: reference(),
-                TimerRef :: reference() | undefined,
-                Holder :: ets:tid()}.
+-type ref() :: {
+    Pool :: pid(), Ref :: reference(), TimerRef :: reference() | undefined, Holder :: ets:tid()
+}.
 
 -ifdef(TEST).
 -export([tid/1]).
@@ -51,8 +56,8 @@ checkout(Pool, Opts) ->
     Timeout = abs_timeout(Now, Opts),
     case checkout(Pool, MaybeQueue, Now, Timeout) of
         {ok, Ref, _, Conn} ->
-           {ok, Ref, Conn};
-        Error={error, _} ->
+            {ok, Ref, Conn};
+        Error = {error, _} ->
             Error;
         {exit, Reason} ->
             exit({Reason, {?MODULE, checkout, [Pool, Opts]}})
@@ -93,8 +98,16 @@ init({Pool, PoolConfig}) ->
     Interval = maps:get(queue_interval, PoolConfig, ?QUEUE_INTERVAL),
     IdleInterval = maps:get(idle_interval, PoolConfig, ?IDLE_INTERVAL),
     Now = erlang:monotonic_time(?TIME_UNIT),
-    Codel = #{target => Target, interval => Interval, delay => 0, slow => false,
-              next => Now, poll => undefined, idle_interval => IdleInterval, idle => undefined},
+    Codel = #{
+        target => Target,
+        interval => Interval,
+        delay => 0,
+        slow => false,
+        next => Now,
+        poll => undefined,
+        idle_interval => IdleInterval,
+        idle => undefined
+    },
     Codel1 = start_idle(Now, Now, start_poll(Now, Now, Codel)),
     {ok, {busy, QueueTid, Codel1}}.
 
@@ -111,20 +124,20 @@ normalize_pool_config_value(_, V) ->
 handle_call(tid, _From, {_, Queue, _} = D) ->
     {reply, Queue, D}.
 
-handle_info({db_connection, From, {checkout, Now, MaybeQueue}}, Busy={busy, Queue, _}) ->
+handle_info({db_connection, From, {checkout, Now, MaybeQueue}}, Busy = {busy, Queue, _}) ->
     case MaybeQueue of
-      true ->
-        ets:insert(Queue, {{Now, erlang:unique_integer(), From}}),
-        {noreply, Busy};
-      false ->
-        Message = "connection not available and queuing is disabled",
-        gen_server:reply(From, {error, Message}),
-        {noreply, Busy}
-  end;
-handle_info(Checkout={db_connection, From, {checkout, _Now, _MaybeQueue}}, Ready) ->
+        true ->
+            ets:insert(Queue, {{Now, erlang:unique_integer(), From}}),
+            {noreply, Busy};
+        false ->
+            Message = "connection not available and queuing is disabled",
+            gen_server:reply(From, {error, Message}),
+            {noreply, Busy}
+    end;
+handle_info(Checkout = {db_connection, From, {checkout, _Now, _MaybeQueue}}, Ready) ->
     {ready, Queue, _Codel} = Ready,
     case ets:first(Queue) of
-        Key={_Time, Holder} ->
+        Key = {_Time, Holder} ->
             checkout_holder(Holder, From, Queue) andalso ets:delete(Queue, Key),
             {noreply, Ready};
         '$end_of_table' ->
@@ -133,7 +146,6 @@ handle_info(Checkout={db_connection, From, {checkout, _Now, _MaybeQueue}}, Ready
 handle_info({'ETS-TRANSFER', Holder, _Pid, Queue}, {_, Queue, _} = Data) ->
     disconnect_holder(Holder, {error, client_disconnected}),
     {noreply, Data};
-
 handle_info({'ETS-TRANSFER', Holder, _, {Msg, Queue, Extra}}, {_, Queue, _} = Data) ->
     case Msg of
         checkin ->
@@ -145,7 +157,6 @@ handle_info({'ETS-TRANSFER', Holder, _, {Msg, Queue, Extra}}, {_, Queue, _} = Da
             stop_holder(Holder, Extra),
             {noreply, Data}
     end;
-
 handle_info({timeout, Deadline, {Queue, Holder, _Pid, _Len}}, {_, Queue, _} = Data) ->
     %% Check that timeout refers to current holder (and not previous)
     case ets:lookup_element(Holder, ?HOLDER_KEY, 3) of
@@ -156,7 +167,6 @@ handle_info({timeout, Deadline, {Queue, Holder, _Pid, _Len}}, {_, Queue, _} = Da
             ok
     end,
     {noreply, Data};
-
 handle_info({timeout, Poll, {Time, LastSent}}, {_, _, #{poll := Poll}} = Data) ->
     {Status, Queue, Codel} = Data,
     %% If no queue progress since last poll check queue
@@ -169,7 +179,6 @@ handle_info({timeout, Poll, {Time, LastSent}}, {_, _, #{poll := Poll}} = Data) -
         _ ->
             {noreply, {Status, Queue, start_poll(Time, Time, Codel)}}
     end;
-
 handle_info({timeout, Idle, {Time, LastSent}}, {_, Queue, #{idle := Idle}} = Data) ->
     {Status, Queue, Codel} = Data,
     %% If no queue progress since last idle check oldest connection
@@ -185,8 +194,9 @@ handle_info({timeout, Idle, {Time, LastSent}}, {_, Queue, #{idle := Idle}} = Dat
 
 timeout(Delay, Time, Queue, Codel) ->
     case Codel of
-        #{delay := MinDelay, next := Next, target := Target, interval := Interval}
-          when Time >= Next andalso MinDelay > Target ->
+        #{delay := MinDelay, next := Next, target := Target, interval := Interval} when
+            Time >= Next andalso MinDelay > Target
+        ->
             Codel1 = Codel#{slow := true, delay := Delay, next := Time + Interval},
             drop_slow(Time, Target * 2, Queue),
             {noreply, {busy, Queue, Codel1}};
@@ -220,12 +230,12 @@ handle_checkin(Holder, Now, {busy, Queue, Codel}) ->
 
 dequeue(Time, Holder, Queue, Codel) ->
     case Codel of
-      #{next := Next, delay := Delay, target := Target} when Time >= Next  ->
-        dequeue_first(Time, Delay > Target, Holder, Queue, Codel);
-      #{slow := false} ->
-        dequeue_fast(Time, Holder, Queue, Codel);
-      #{slow := true, target := Target} ->
-        dequeue_slow(Time, Target * 2, Holder, Queue, Codel)
+        #{next := Next, delay := Delay, target := Target} when Time >= Next ->
+            dequeue_first(Time, Delay > Target, Holder, Queue, Codel);
+        #{slow := false} ->
+            dequeue_fast(Time, Holder, Queue, Codel);
+        #{slow := true, target := Target} ->
+            dequeue_slow(Time, Target * 2, Holder, Queue, Codel)
     end.
 
 dequeue_first(Time, Slow, Holder, Queue, Codel) ->
@@ -235,7 +245,7 @@ dequeue_first(Time, Slow, Holder, Queue, Codel) ->
         {Sent, _, From} = Key ->
             ets:delete(Queue, Key),
             Delay = Time - Sent,
-            Codel1 =  Codel#{next => Next, delay => Delay, slow => Slow},
+            Codel1 = Codel#{next => Next, delay => Delay, slow => Slow},
             go(Delay, From, Time, Holder, Queue, Codel1);
         '$end_of_table' ->
             Codel1 = Codel#{next => Next, delay => 0, slow => Slow},
@@ -267,7 +277,7 @@ dequeue_slow(Time, Timeout, Holder, Queue, Codel) ->
             {noreply, {ready, Queue, Codel#{delay => 0}}}
     end.
 
-go(Delay, From, Time, Holder, Queue, Codel=#{delay := Min}) ->
+go(Delay, From, Time, Holder, Queue, Codel = #{delay := Min}) ->
     case checkout_holder(Holder, From, Queue) of
         true when Delay < Min ->
             {noreply, {busy, Queue, Codel#{delay => Delay}}};
@@ -305,7 +315,7 @@ start_poll(Now, LastSent, #{interval := Interval} = Codel) ->
     Poll = erlang:start_timer(Timeout, self(), {Timeout, LastSent}, [{abs, true}]),
     Codel#{poll => Poll}.
 
-start_idle(Now, LastSent, Codel=#{idle_interval := Interval}) ->
+start_idle(Now, LastSent, Codel = #{idle_interval := Interval}) ->
     Timeout = Now + Interval,
     Idle = erlang:start_timer(Timeout, self(), {Timeout, LastSent}, [{abs, true}]),
     Codel#{idle => Idle}.
@@ -319,12 +329,12 @@ start_holder(Pool, Ref, Mod, State) ->
 
 checkout(Pool, Queue, Start, Timeout) ->
     case erlang:whereis(Pool) of
-      Pid when node(Pid) == node() ->
-        checkout_call(Pid, Queue, Start, Timeout);
-      Pid when node(Pid) =/= node() ->
-        {exit, {badnode, node(Pid)}};
-      undefined ->
-        {exit, noproc}
+        Pid when node(Pid) == node() ->
+            checkout_call(Pid, Queue, Start, Timeout);
+        Pid when node(Pid) =/= node() ->
+            {exit, {badnode, node(Pid)}};
+        undefined ->
+            {exit, noproc}
     end.
 
 checkout_call(Pid, Queue, Start, Timeout) ->
@@ -351,10 +361,10 @@ checkout_info(Holder, PoolRef) ->
         [{_, _, _, Mod, State}] ->
             {ok, PoolRef, Mod, State}
     catch
-      _:_ ->
-        %% Deadline could hit and by handled pool before using connection
-        Msg = "connection not available because deadline reached while in queue",
-        {error, Msg}
+        _:_ ->
+            %% Deadline could hit and by handled pool before using connection
+            Msg = "connection not available because deadline reached while in queue",
+            {error, Msg}
     end.
 
 checkout_holder(Holder, {Pid, MRef}, Ref) ->
