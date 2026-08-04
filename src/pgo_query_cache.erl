@@ -1,15 +1,19 @@
 -module(pgo_query_cache).
 
--export([start_link/0,
-         lookup/2,
-         insert/3,
-         reset/0,
-         delete/1]).
+-export([
+    start_link/0,
+    lookup/2,
+    insert/3,
+    reset/0,
+    delete/1
+]).
 
--export([init/1,
-         callback_mode/0,
-         ready/3,
-         terminate/3]).
+-export([
+    init/1,
+    callback_mode/0,
+    ready/3,
+    terminate/3
+]).
 
 -record(data, {}).
 
@@ -41,7 +45,7 @@ init([]) ->
 callback_mode() ->
     state_functions.
 
-ready(_, _, _Data=#data{}) ->
+ready(_, _, _Data = #data{}) ->
     keep_state_and_data.
 
 terminate(_, _, #data{}) ->

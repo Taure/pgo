@@ -13,21 +13,27 @@
 %%% @end
 
 -module(pgo_scram).
--export([get_nonce/1,
-         get_client_first/2,
-         get_client_final/4,
-         parse_server_first/2,
-         parse_server_final/1]).
--export([hi/3,
-         hmac/2,
-         h/1,
-         bin_xor/2]).
+-export([
+    get_nonce/1,
+    get_client_first/2,
+    get_client_final/4,
+    parse_server_first/2,
+    parse_server_final/1
+]).
+-export([
+    hi/3,
+    hmac/2,
+    h/1,
+    bin_xor/2
+]).
 
 -type nonce() :: binary().
--type server_first() :: [{nonce, nonce()} |
-                         {salt, binary()} |
-                         {i, pos_integer()} |
-                         {raw, binary()}].
+-type server_first() :: [
+    {nonce, nonce()}
+    | {salt, binary()}
+    | {i, pos_integer()}
+    | {raw, binary()}
+].
 
 -export_type([nonce/0]).
 
@@ -55,13 +61,16 @@ parse_server_first(ServerFirst, ClientNonce) ->
     (length(PartsB) == 3) orelse error({invalid_server_first, ServerFirst}),
     Parts =
         lists:map(
-          fun(<<"r=", R/binary>>) ->
-                  {nonce, R};
-             (<<"s=", S/binary>>) ->
-                  {salt, base64:decode(S)};
-             (<<"i=", I/binary>>) ->
-                  {i, binary_to_integer(I)}
-          end, PartsB),
+            fun
+                (<<"r=", R/binary>>) ->
+                    {nonce, R};
+                (<<"s=", S/binary>>) ->
+                    {salt, base64:decode(S)};
+                (<<"i=", I/binary>>) ->
+                    {i, binary_to_integer(I)}
+            end,
+            PartsB
+        ),
     check_nonce(ClientNonce, proplists:get_value(nonce, Parts)),
     [{raw, ServerFirst} | Parts].
 
@@ -72,9 +81,10 @@ parse_server_first(ServerFirst, ClientNonce) ->
 %% ClientSignature := HMAC(StoredKey, AuthMessage)
 %% ClientProof     := ClientKey XOR ClientSignature
 -spec get_client_final(server_first(), nonce(), iodata(), iodata()) ->
-                              {ClientFinal :: iodata(), ServerSignature :: binary()}.
+    {ClientFinal :: iodata(), ServerSignature :: binary()}.
 get_client_final(SrvFirst, ClientNonce, UserName, Password) ->
-    ChannelBinding = <<"c=biws">>,                 %channel-binding isn't implemented
+    %channel-binding isn't implemented
+    ChannelBinding = <<"c=biws">>,
     Nonce = [<<"r=">>, proplists:get_value(nonce, SrvFirst)],
 
     Salt = proplists:get_value(salt, SrvFirst),
@@ -121,13 +131,13 @@ hi1(Str, U, Hi, I) ->
     hi1(Str, U2, Hi1, I - 1).
 
 -ifdef(OTP_RELEASE).
- -if(?OTP_RELEASE >= 23).
- hmac(Key, Str) ->
-     crypto:mac(hmac, sha256, Key, Str).
- -else.
- hmac(Key, Str) ->
-     crypto:hmac(sha256, Key, Str).
- -endif.
+-if(?OTP_RELEASE >= 23).
+hmac(Key, Str) ->
+    crypto:mac(hmac, sha256, Key, Str).
+-else.
+hmac(Key, Str) ->
+    crypto:hmac(sha256, Key, Str).
+-endif.
 -else.
 hmac(Key, Str) ->
     crypto:hmac(sha256, Key, Str).
@@ -143,7 +153,6 @@ bin_xor(B1, B2) ->
 unique() ->
     erlang:unique_integer([positive]).
 
-
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
 
@@ -153,9 +162,12 @@ exchange_test() ->
     Username = <<>>,
 
     ClientFirst = <<"n,,n=,r=9IZ2O01zb9IgiIZ1WJ/zgpJB">>,
-    ServerFirst = <<"r=9IZ2O01zb9IgiIZ1WJ/zgpJBjx/oIRLs02gGSHcw1KEty3eY,s=fs3IXBy7U7+IvVjZ,i=4096">>,
-    ClientFinal = <<"c=biws,r=9IZ2O01zb9IgiIZ1WJ/zgpJBjx/oIRLs02gGSHcw1KEty3eY,p=AmNKosjJzS31NTlQ"
-                    "YNs5BTeQjdHdk7lOflDo5re2an8=">>,
+    ServerFirst =
+        <<"r=9IZ2O01zb9IgiIZ1WJ/zgpJBjx/oIRLs02gGSHcw1KEty3eY,s=fs3IXBy7U7+IvVjZ,i=4096">>,
+    ClientFinal = <<
+        "c=biws,r=9IZ2O01zb9IgiIZ1WJ/zgpJBjx/oIRLs02gGSHcw1KEty3eY,p=AmNKosjJzS31NTlQ"
+        "YNs5BTeQjdHdk7lOflDo5re2an8="
+    >>,
     ServerFinal = <<"v=U+ppxD5XUKtradnv8e2MkeupiA8FU87Sg8CXzXHDAzw=">>,
 
     ?assertEqual(ClientFirst, iolist_to_binary(get_client_first(Username, Nonce))),

@@ -8,11 +8,24 @@
 %%%% CREATE DATABASE test WITH OWNER=test;
 %%%%
 
--define(UUID, <<114,127,66,166,230,160,66,35,155,114,106,94,183,67,106,181>>).
+-define(UUID, <<114, 127, 66, 166, 230, 160, 66, 35, 155, 114, 106, 94, 183, 67, 106, 181>>).
 -define(TXT_UUID, <<"727F42A6-E6A0-4223-9B72-6A5EB7436AB5">>).
 
--define(UNTIL(X), (fun Until(I) when I =:= 10 -> erlang:error(fail);
-                       Until(I) -> case X of true -> ok; false -> timer:sleep(10), Until(I+1) end end)(0)).
+-define(UNTIL(X),
+    (fun
+        Until(I) when I =:= 10 -> erlang:error(fail);
+        Until(I) ->
+            case X of
+                true ->
+                    ok;
+                false ->
+                    timer:sleep(10),
+                    Until(I + 1)
+            end
+    end)(
+        0
+    )
+).
 
 %% array_types_test_() ->
 %%     {setup,
@@ -802,4 +815,3 @@
 %%                 ]
 %%         end
 %%     }.
-

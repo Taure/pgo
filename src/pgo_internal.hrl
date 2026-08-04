@@ -1,13 +1,15 @@
--record(conn, {owner :: pid(),
-               socket :: gen_tcp:socket() | ssl:sslsocket(),
-               socket_module :: ssl | gen_tcp,
-               pool :: atom(),
-               parameters :: map(),
-               queue :: boolean(),
-               trace :: boolean(),
-               trace_attributes :: [{unicode:unicode_binary(), unicode:unicode_binary() | integer()}],
-               include_statement_span_attribute :: boolean(),
-               decode_opts :: []}).
+-record(conn, {
+    owner :: pid(),
+    socket :: gen_tcp:socket() | ssl:sslsocket(),
+    socket_module :: ssl | gen_tcp,
+    pool :: atom(),
+    parameters :: map(),
+    queue :: boolean(),
+    trace :: boolean(),
+    trace_attributes :: [{unicode:unicode_binary(), unicode:unicode_binary() | integer()}],
+    include_statement_span_attribute :: boolean(),
+    decode_opts :: []
+}).
 
 % Backend messages
 -type oid() :: pos_integer().
@@ -43,7 +45,8 @@
 -define(BOXOID, 603).
 -define(POLYGONOID, 604).
 -define(LINEOID, 628).
--define(CIDRARRAYOID, 651).         % not #defined
+% not #defined
+-define(CIDRARRAYOID, 651).
 -define(FLOAT4OID, 700).
 -define(FLOAT8OID, 701).
 -define(ABSTIMEOID, 702).
@@ -55,37 +58,64 @@
 -define(MACADDROID, 829).
 -define(INETOID, 869).
 -define(CIDROID, 650).
--define(BOOLARRAYOID, 1000).        % not #defined
--define(BYTEAARRAYOID, 1001).       % not #defined
--define(CHARARRAYOID, 1002).        % not #defined
--define(NAMEARRAYOID, 1003).        % not #defined
--define(INT2ARRAYOID, 1005).        % not #defined
--define(INT2VECTORARRAYOID, 1006).  % not #defined
+% not #defined
+-define(BOOLARRAYOID, 1000).
+% not #defined
+-define(BYTEAARRAYOID, 1001).
+% not #defined
+-define(CHARARRAYOID, 1002).
+% not #defined
+-define(NAMEARRAYOID, 1003).
+% not #defined
+-define(INT2ARRAYOID, 1005).
+% not #defined
+-define(INT2VECTORARRAYOID, 1006).
 -define(INT4ARRAYOID, 1007).
--define(REGPROCARRAYOID, 1008).     % not #defined
+% not #defined
+-define(REGPROCARRAYOID, 1008).
 -define(TEXTARRAYOID, 1009).
--define(TIDARRAYOID, 1010).         % not #defined
--define(XIDARRAYOID, 1011).         % not #defined
--define(CIDARRAYOID, 1012).         % not #defined
--define(OIDVECTORARRAYOID, 1013).   % not #defined
--define(BPCHARARRAYOID, 1014).      % not #defined
--define(VARCHARARRAYOID, 1015).     % not #defined
--define(INT8ARRAYOID, 1016).        % not #defined
--define(POINTARRAYOID, 1017).       % not #defined
--define(LSEGARRAYOID, 1018).        % not #defined
--define(PATHARRAYOID, 1019).        % not #defined
--define(BOXARRAYOID, 1020).         % not #defined
+% not #defined
+-define(TIDARRAYOID, 1010).
+% not #defined
+-define(XIDARRAYOID, 1011).
+% not #defined
+-define(CIDARRAYOID, 1012).
+% not #defined
+-define(OIDVECTORARRAYOID, 1013).
+% not #defined
+-define(BPCHARARRAYOID, 1014).
+% not #defined
+-define(VARCHARARRAYOID, 1015).
+% not #defined
+-define(INT8ARRAYOID, 1016).
+% not #defined
+-define(POINTARRAYOID, 1017).
+% not #defined
+-define(LSEGARRAYOID, 1018).
+% not #defined
+-define(PATHARRAYOID, 1019).
+% not #defined
+-define(BOXARRAYOID, 1020).
 -define(FLOAT4ARRAYOID, 1021).
--define(FLOAT8ARRAYOID, 1022).      % not #defined
--define(ABSTIMEARRAYOID, 1023).     % not #defined
--define(RELTIMEARRAYOID, 1024).     % not #defined
--define(TINTERVALARRAYOID, 1025).   % not #defined
--define(POLYGONARRAYOID, 1027).     % not #defined
--define(OIDARRAYOID, 1028).         % not #defined
+% not #defined
+-define(FLOAT8ARRAYOID, 1022).
+% not #defined
+-define(ABSTIMEARRAYOID, 1023).
+% not #defined
+-define(RELTIMEARRAYOID, 1024).
+% not #defined
+-define(TINTERVALARRAYOID, 1025).
+% not #defined
+-define(POLYGONARRAYOID, 1027).
+% not #defined
+-define(OIDARRAYOID, 1028).
 -define(ACLITEMOID, 1033).
--define(ACLITEMARRAYOID, 1034).     % not #defined
--define(MACADDRARRAYOID, 1040).     % not #defined
--define(INETARRAYOID, 1041).        % not #defined
+% not #defined
+-define(ACLITEMARRAYOID, 1034).
+% not #defined
+-define(MACADDRARRAYOID, 1040).
+% not #defined
+-define(INETARRAYOID, 1041).
 -define(BPCHAROID, 1042).
 -define(VARCHAROID, 1043).
 -define(DATEOID, 1082).
@@ -105,8 +135,10 @@
 -define(REGCLASSOID, 2205).
 -define(REGTYPEOID, 2206).
 -define(REGTYPEARRAYOID, 2211).
--define(UUIDOID, 2950). % not #defined
--define(UUIDARRAYOID, 2951). % not #defined
+% not #defined
+-define(UUIDOID, 2950).
+% not #defined
+-define(UUIDARRAYOID, 2951).
 -define(TSVECTOROID, 3614).
 -define(GTSVECTOROID, 3642).
 -define(TSQUERYOID, 3615).
@@ -136,97 +168,114 @@
 -define(FDW_HANDLEROID, 3115).
 
 -define(PG_TYPE_H_TYPES_DICT, [
-{?BOOLOID, bool},
-{?BYTEAOID, bytea},
-{?CHAROID, char},
-{?NAMEOID, name},
-{?INT8OID, int8},
-{?INT2OID, int2},
-{?INT2VECTOROID, int2vector},
-{?INT4OID, int4},
-{?REGPROCOID, regproc},
-{?TEXTOID, text},
-{?OIDOID, oid},
-{?TIDOID, tid},
-{?XIDOID, xid},
-{?CIDOID, cid},
-{?OIDVECTOROID, oidvector},
-{?JSONOID, json},
-{?JSONBOID, jsonb},
-{?XMLOID, xml},
-{?PGNODETREEOID, pgnodetree},
-{?POINTOID, point},
-{?LSEGOID, lseg},
-{?PATHOID, path},
-{?BOXOID, box},
-{?POLYGONOID, polygon},
-{?LINEOID, line},
-{?FLOAT4OID, float4},
-{?FLOAT8OID, float8},
-{?ABSTIMEOID, abstime},
-{?RELTIMEOID, reltime},
-{?TINTERVALOID, tinterval},
-{?UNKNOWNOID, unknown},
-{?CIRCLEOID, circle},
-{?CASHOID, cash},
-{?MACADDROID, macaddr},
-{?INETOID, inet},
-{?CIDROID, cidr},
-{?INT4ARRAYOID, int4array},
-{?TEXTARRAYOID, textarray},
-{?FLOAT4ARRAYOID, float4array},
-{?ACLITEMOID, aclitem},
-{?CSTRINGARRAYOID, cstringarray},
-{?BPCHAROID, bpchar},
-{?VARCHAROID, varchar},
-{?DATEOID, date},
-{?TIMEOID, time},
-{?TIMESTAMPOID, timestamp},
-{?TIMESTAMPTZOID, timestamptz},
-{?INTERVALOID, interval},
-{?TIMETZOID, timetz},
-{?BITOID, bit},
-{?VARBITOID, varbit},
-{?NUMERICOID, numeric},
-{?REFCURSOROID, refcursor},
-{?REGPROCEDUREOID, regprocedure},
-{?REGOPEROID, regoper},
-{?REGOPERATOROID, regoperator},
-{?REGCLASSOID, regclass},
-{?REGTYPEOID, regtype},
-{?REGTYPEARRAYOID, regtypearray},
-{?UUIDOID, uuid}, % not #defined
-{?TSVECTOROID, tsvector},
-{?GTSVECTOROID, gtsvector},
-{?TSQUERYOID, tsquery},
-{?REGCONFIGOID, regconfig},
-{?REGDICTIONARYOID, regdictionary},
-{?INT4RANGEOID, int4range},
-{?INT8RANGEOID, int8range},
-{?NUMRANGEOID, numrange},
-{?TSTZRANGEOID, tstzrange},
-{?DATERANGEOID, daterange},
-{?TSRANGEOID, tsrange},
-{?RECORDOID, record},
-{?RECORDARRAYOID, recordarray},
-{?CSTRINGOID, cstring},
-{?ANYOID, any},
-{?ANYARRAYOID, anyarray},
-{?VOIDOID, void},
-{?TRIGGEROID, trigger},
-{?LANGUAGE_HANDLEROID, language_handler},
-{?INTERNALOID, internal},
-{?OPAQUEOID, opaque},
-{?ANYELEMENTOID, anyelement},
-{?ANYNONARRAYOID, anynonarray},
-{?ANYENUMOID, anyenum},
-{?FDW_HANDLEROID, fdw_handler},
-{?ANYRANGEOID, anyrange}
+    {?BOOLOID, bool},
+    {?BYTEAOID, bytea},
+    {?CHAROID, char},
+    {?NAMEOID, name},
+    {?INT8OID, int8},
+    {?INT2OID, int2},
+    {?INT2VECTOROID, int2vector},
+    {?INT4OID, int4},
+    {?REGPROCOID, regproc},
+    {?TEXTOID, text},
+    {?OIDOID, oid},
+    {?TIDOID, tid},
+    {?XIDOID, xid},
+    {?CIDOID, cid},
+    {?OIDVECTOROID, oidvector},
+    {?JSONOID, json},
+    {?JSONBOID, jsonb},
+    {?XMLOID, xml},
+    {?PGNODETREEOID, pgnodetree},
+    {?POINTOID, point},
+    {?LSEGOID, lseg},
+    {?PATHOID, path},
+    {?BOXOID, box},
+    {?POLYGONOID, polygon},
+    {?LINEOID, line},
+    {?FLOAT4OID, float4},
+    {?FLOAT8OID, float8},
+    {?ABSTIMEOID, abstime},
+    {?RELTIMEOID, reltime},
+    {?TINTERVALOID, tinterval},
+    {?UNKNOWNOID, unknown},
+    {?CIRCLEOID, circle},
+    {?CASHOID, cash},
+    {?MACADDROID, macaddr},
+    {?INETOID, inet},
+    {?CIDROID, cidr},
+    {?INT4ARRAYOID, int4array},
+    {?TEXTARRAYOID, textarray},
+    {?FLOAT4ARRAYOID, float4array},
+    {?ACLITEMOID, aclitem},
+    {?CSTRINGARRAYOID, cstringarray},
+    {?BPCHAROID, bpchar},
+    {?VARCHAROID, varchar},
+    {?DATEOID, date},
+    {?TIMEOID, time},
+    {?TIMESTAMPOID, timestamp},
+    {?TIMESTAMPTZOID, timestamptz},
+    {?INTERVALOID, interval},
+    {?TIMETZOID, timetz},
+    {?BITOID, bit},
+    {?VARBITOID, varbit},
+    {?NUMERICOID, numeric},
+    {?REFCURSOROID, refcursor},
+    {?REGPROCEDUREOID, regprocedure},
+    {?REGOPEROID, regoper},
+    {?REGOPERATOROID, regoperator},
+    {?REGCLASSOID, regclass},
+    {?REGTYPEOID, regtype},
+    {?REGTYPEARRAYOID, regtypearray},
+    % not #defined
+    {?UUIDOID, uuid},
+    {?TSVECTOROID, tsvector},
+    {?GTSVECTOROID, gtsvector},
+    {?TSQUERYOID, tsquery},
+    {?REGCONFIGOID, regconfig},
+    {?REGDICTIONARYOID, regdictionary},
+    {?INT4RANGEOID, int4range},
+    {?INT8RANGEOID, int8range},
+    {?NUMRANGEOID, numrange},
+    {?TSTZRANGEOID, tstzrange},
+    {?DATERANGEOID, daterange},
+    {?TSRANGEOID, tsrange},
+    {?RECORDOID, record},
+    {?RECORDARRAYOID, recordarray},
+    {?CSTRINGOID, cstring},
+    {?ANYOID, any},
+    {?ANYARRAYOID, anyarray},
+    {?VOIDOID, void},
+    {?TRIGGEROID, trigger},
+    {?LANGUAGE_HANDLEROID, language_handler},
+    {?INTERNALOID, internal},
+    {?OPAQUEOID, opaque},
+    {?ANYELEMENTOID, anyelement},
+    {?ANYNONARRAYOID, anynonarray},
+    {?ANYENUMOID, anyenum},
+    {?FDW_HANDLEROID, fdw_handler},
+    {?ANYRANGEOID, anyrange}
 ]).
 
--type error_field() :: severity | code | message | detail | hint | position | internal_position
-                     | internal_query | where | file | line | routine
-                     | schema | table | column | data_type | constraint | {unknown, byte()}.
+-type error_field() ::
+    severity
+    | code
+    | message
+    | detail
+    | hint
+    | position
+    | internal_position
+    | internal_query
+    | where
+    | file
+    | line
+    | routine
+    | schema
+    | table
+    | column
+    | data_type
+    | constraint
+    | {unknown, byte()}.
 
 -record(authentication_ok, {}).
 -record(authentication_kerberos_v5, {}).
@@ -325,36 +374,36 @@
 }).
 
 -type pgsql_backend_message() ::
-        #authentication_cleartext_password{} |
-        #authentication_gss_continue{} |
-        #authentication_gss{} |
-        #authentication_kerberos_v5{} |
-        #authentication_md5_password{} |
-        #authentication_sasl_password{} |
-        #authentication_server_final_message{} |
-        #authentication_server_first_message{} |
-        #authentication_ok{} |
-        #authentication_scm_credential{} |
-        #authentication_sspi{} |
-        #backend_key_data{} |
-        #bind_complete{} |
-        #close_complete{} |
-        #command_complete{} |
-        #copy_both_response{} |
-        #copy_data{} |
-        #copy_done{} |
-        #copy_in_response{} |
-        #copy_out_response{} |
-        #data_row{} |
-        #empty_query_response{} |
-        #error_response{} |
-        #function_call_response{} |
-        #no_data{} |
-        #notice_response{} |
-        #notification_response{} |
-        #parameter_description{} |
-        #parameter_status{} |
-        #parse_complete{} |
-        #portal_suspended{} |
-        #ready_for_query{} |
-        #row_description{}.
+    #authentication_cleartext_password{}
+    | #authentication_gss_continue{}
+    | #authentication_gss{}
+    | #authentication_kerberos_v5{}
+    | #authentication_md5_password{}
+    | #authentication_sasl_password{}
+    | #authentication_server_final_message{}
+    | #authentication_server_first_message{}
+    | #authentication_ok{}
+    | #authentication_scm_credential{}
+    | #authentication_sspi{}
+    | #backend_key_data{}
+    | #bind_complete{}
+    | #close_complete{}
+    | #command_complete{}
+    | #copy_both_response{}
+    | #copy_data{}
+    | #copy_done{}
+    | #copy_in_response{}
+    | #copy_out_response{}
+    | #data_row{}
+    | #empty_query_response{}
+    | #error_response{}
+    | #function_call_response{}
+    | #no_data{}
+    | #notice_response{}
+    | #notification_response{}
+    | #parameter_description{}
+    | #parameter_status{}
+    | #parse_complete{}
+    | #portal_suspended{}
+    | #ready_for_query{}
+    | #row_description{}.

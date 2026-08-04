@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main, stable]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - '.gitignore'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - '.gitignore'
+
+jobs:
+  ci:
+    uses: Taure/erlang-ci/.github/workflows/ci.yml@v2.1.4
+    permissions:
+      contents: write
+      pull-requests: write
+    with:
+      version-file: '.tool-versions'
+      otp-matrix: '["28", "29"]'
+      enable-ct: true
+      enable-eunit: true
+      enable-audit: true
+      enable-coverage: true
+      enable-sbom: true
+      enable-sbom-scan: true
+      enable-elp-lint: true
+      enable-elp-eqwalize: false
+      enable-summary: true
+      # Dependency Graph is currently disabled on this repository, so the
+      # submission API 404s. Flip this to true after running:
+      #   gh api -X PUT repos/Taure/pgo/vulnerability-alerts
+      enable-dependency-submission: false
+      extra-services-compose: 'docker-compose.yml'
