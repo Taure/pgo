@@ -1,0 +1,148 @@
+NOTICE
+======
+
+This repository is a derivative work. It is a fork of pgo
+(https://github.com/erleans/pgo) and contains code derived from several other
+projects. This file records the origin and licence of each, and must be kept
+with the source when it is redistributed.
+
+Modifications made in this fork:
+
+    Copyright (c) 2026 Widgrens IT AB (org.nr 559241-2752)
+    Melongatan 15, 754 49 Uppsala, Sweden
+
+    Licensed under the Apache License, Version 2.0. See LICENSE.
+
+This copyright statement covers only the modifications made in this fork. It
+does not extend to, replace, or reassign the rights of any upstream author
+listed below.
+
+
+1. pgo (direct upstream)
+------------------------
+
+    Project:  pgo
+    Source:   https://github.com/erleans/pgo
+    Author:   Tristan Sloughter and the pgo contributors
+    Licence:  Apache License, Version 2.0
+
+Everything in this repository other than the modifications made in this fork
+originates with the pgo project, and the great majority of the code is still
+theirs. A copy of the Apache License, Version 2.0 is distributed in LICENSE, as
+clause 4(a) requires.
+
+Upstream distributes the Apache-2.0 licence text with no copyright line filled
+in, and ships no NOTICE file. No copyright holder is asserted here on their
+behalf. Because the upstream Work includes no NOTICE file, clause 4(d) imposes
+no reproduction obligation; the notices in this file are added under the
+permission in the final sentence of 4(d), which allows a distributor to add its
+own attribution notices.
+
+Files derived from other projects carry a modification notice in their header,
+per clause 4(b). Attribution notices found in the upstream source are retained,
+per clause 4(c); upstream's own Acknowledgements section is kept in README.md.
+
+
+2. semiocast/pgsql
+------------------
+
+    Project:  pgsql
+    Source:   https://github.com/semiocast/pgsql
+    Licence:  BSD 2-Clause "Simplified" License (SPDX: BSD-2-Clause)
+    Applies:  src/pgo_handler.erl  (from pgsql_connection)
+              src/pgo_protocol.erl (from pgsql_protocol)
+
+The following notice, list of conditions and disclaimer are reproduced from the
+LICENSE file of https://github.com/semiocast/pgsql. Only line breaks have been
+introduced; the wording is unaltered.
+
+    Copyright (c) 2009-2014, Semiocast.
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+The two files listed above have been changed substantially from the originals,
+first in pgo and then in this fork.
+
+
+3. db_connection
+----------------
+
+    Project:  db_connection
+    Source:   https://github.com/elixir-ecto/db_connection
+              specifically pull request 108
+              https://github.com/elixir-ecto/db_connection/pull/108
+    Author:   James Fish
+    Licence:  Apache License, Version 2.0
+    Applies:  src/pgo_pool.erl
+
+db_connection ships no LICENSE file at its repository root. Its licence is
+declared as "Apache-2.0" in the package section of mix.exs, and its README
+carries the notice "Copyright 2015 James Fish" followed by the standard Apache
+License, Version 2.0 boilerplate. Those are the sources for the licence and
+copyright stated above.
+
+src/pgo_pool.erl is an Erlang port, made in pgo, of the Elixir pool proposed in
+that pull request, and has been changed further since.
+
+
+4. epgsql
+---------
+
+    Project:  epgsql
+    Source:   https://github.com/epgsql/epgsql
+    Licence:  BSD 3-Clause "New" or "Revised" License (SPDX: BSD-3-Clause)
+
+pgo's own Acknowledgements section credits epgsql "especially for some decoding
+logic". No file in this repository names epgsql, and the extent of any
+derivation has not been established. The notice is reproduced here so that the
+credit and its terms travel with the source. It is reproduced from the LICENSE
+file of https://github.com/epgsql/epgsql; only line breaks have been
+introduced.
+
+    Copyright (c) 2008, Will Glozer
+    Copyright (c) 2011, Anton Lebedevich
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in the
+          documentation and/or other materials provided with the distribution.
+        * Neither the name of Will Glozer nor the names of his contributors may
+          be used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.

@@ -1,5 +1,21 @@
 %% shamelessly stolen from James Fish's pool found in
 %% db_connectin https://github.com/elixir-ecto/db_connection/pull/108
+%%
+%% Original work: db_connection, https://github.com/elixir-ecto/db_connection
+%% specifically pull request 108, by James Fish.
+%% Copyright 2015 James Fish
+%% Licence: Apache License, Version 2.0
+%%
+%% db_connection ships no LICENSE file at its repository root. The licence is
+%% declared as "Apache-2.0" in the package section of its mix.exs, and the
+%% copyright line above is the one in its README. See NOTICE.
+%%
+%% This file has been changed from the original. The Elixir pool proposed in
+%% that pull request was ported to Erlang as pgo_pool in pgo
+%% (https://github.com/erleans/pgo, Apache-2.0) and has been changed further in
+%% this fork. Those modifications are Copyright (c) 2026 Widgrens IT AB and are
+%% licensed under the Apache License, Version 2.0. See LICENSE and NOTICE at
+%% the root of this repository.
 -module(pgo_pool).
 
 -export([

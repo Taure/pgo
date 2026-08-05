@@ -14,5 +14,8 @@
     {modules, []},
 
     {licenses, ["Apache-2.0"]},
-    {links, [{"Github", "https://github.com/erleans/pgo"}]}
+    {links, [
+        {"GitHub", "https://github.com/Taure/pgo"},
+        {"Upstream", "https://github.com/erleans/pgo"}
+    ]}
 ]}.
